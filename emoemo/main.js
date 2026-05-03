@@ -5,8 +5,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const { Engine, World, Bodies, Body, Runner, Composite, Mouse, MouseConstraint, Events, Query, Vector } = Matter;
 
 let scene, camera, renderer, engine, world;
-let introGroup, particleSystem; 
-const INTRO_COUNT = 20; 
+let introGroup; 
+const INTRO_COUNT = 35; // 背景卡牌數量
 
 // Hybrid Globals
 let physicsEngine, physicsRunner;
@@ -20,39 +20,39 @@ const CARD_TEXTURES = [
     './img/卡_1217圓-02.png', './img/卡_1217圓-04.png', './img/卡_1217圓-18.png',
     './img/卡_1217圓-38.png', './img/卡_1217圓-52.png', './img/卡_1217圓-102.png', './img/卡_1217圓-92.png'
 ];
-// 保留新增的卡片
-const CARD_BACK_TEXTURE = ['./img/卡_1217圓-41.png', './img/卡_1217圓-65.png', './img/卡_1217圓-113.png']; 
-const DOLL_MODEL_PATH = './model/emo02.glb'; 
+const CARD_BACK_TEXTURE = ['./img/事件卡1.png', './img/事件卡2.png', './img/事件卡3.png']; 
+const DOLL_MODEL_PATH = './model/emo棋.glb'; 
 
+// ★ 文字排版：精準切割平均字數
 const QUIZ_DATA = [
     { 
-      q: "伴侶因為工作太累，忘記了你們期待已久的紀念日晚餐。你的第一反應是？", 
-      a1: "感到失落，但心想「他那麼辛苦，我不該為這種小事發脾氣」，默默把委屈吞下去。", 
-      a2: "感到憤怒，並冷冷地說：「沒關係啊，反正工作永遠比我重要，我早就習慣了。」", 
+      q: "伴侶因為工作太累，忘記了你們期待已久的<br>紀念日晚餐，你的第一反應是？", 
+      a1: "感到失落，但心想「他那麼辛苦，我不該<br>為這種小事發脾氣」，默默把委屈吞下去", 
+      a2: "感到憤怒，並冷冷地說：「沒關係啊，<br>反正工作永遠比我重要，我早就習慣了」", 
       s1: "victim", s2: "blackmailer" 
     },
     { 
-      q: "朋友臨時有事，取消了你們週末的旅行。你在回覆訊息時會？", 
-      a1: "趕緊說「沒關係啦，正事要緊！」但其實內心充滿焦慮，擔心對方是不是不想跟自己出去。", 
-      a2: "嘆口氣回覆：「好吧，雖然我為了這趟旅行推掉了其他約會，但既然你這麼忙就算了。」", 
+      q: "朋友臨時有事，取消了你們週末的旅行，<br>你在回覆訊息時會？", 
+      a1: "趕緊說「沒關係啦，正事要緊！」但其實內心<br>充滿焦慮，擔心對方是不是不想跟自己出去", 
+      a2: "嘆口氣回覆：「好吧，雖然我為了這趟旅行<br>推掉了其他約會，但既然你這麼忙就算了」", 
       s1: "victim", s2: "blackmailer" 
     },
     { 
-      q: "家人總是過度干涉你的職涯選擇，常常說「我們這都是為了你好」。你的感受是？", 
-      a1: "覺得壓力很大、很痛苦，但又覺得如果不聽他們的話，自己就是個不知感恩的人。", 
-      a2: "覺得不耐煩，反嗆：「你們根本不懂我！如果我以後過得不好，都是你們害的！」", 
+      q: "家人總是過度干涉你的職涯選擇，常常說<br>「我們這都是為了你好」，你的感受是？", 
+      a1: "覺得壓力很大、很痛苦，但又覺得如果<br>不聽他們的話，自己就是個不知感恩的人", 
+      a2: "覺得不耐煩，反嗆：「你們根本不懂我！<br>如果我以後過得不好，都是你們害的！」", 
       s1: "victim", s2: "blackmailer" 
     },
     { 
-      q: "團隊合作時，同事把應該他負責的麻煩工作推到你身上。你會怎麼做？", 
-      a1: "不知如何拒絕，怕破壞辦公室的和平氣氛，只好加班默默把事情做完。", 
-      a2: "在群組標記他：「如果這個專案因為你進度落後，大家的心血就全毀了，你自己看著辦。」", 
+      q: "團隊合作時，同事把應該他負責的<br>麻煩工作推到你身上，你會怎麼做？", 
+      a1: "不知如何拒絕，怕破壞辦公室的<br>和平氣氛，只好加班默默把事情做完", 
+      a2: "在群組標記他：「如果這個專案因為你進度<br>落後，大家的心血就全毀了，你自己看著辦」", 
       s1: "victim", s2: "blackmailer" 
     },
     { 
-      q: "當你和親密的人發生激烈爭吵，對方為了冷靜選擇先離開現場。你的內心戲是？", 
-      a1: "陷入恐慌，覺得自己做錯了什麼即將被拋棄，想立刻傳長篇大論道歉求對方回來。", 
-      a2: "覺得被挑戰底線，心想：「你今天敢踏出這個門，我們之間就完了。」", 
+      q: "當你和親密的人發生激烈爭吵，對方為了冷靜<br>選擇先離開現場，你的內心戲是？", 
+      a1: "陷入恐慌，覺得自己做錯了什麼即將被拋棄，<br>想立刻傳長篇大論道歉求對方回來", 
+      a2: "覺得被挑戰底線，心想：「你今天敢<br>踏出這個門，我們之間就完了」", 
       s1: "victim", s2: "blackmailer" 
     }
 ];
@@ -63,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loader = document.getElementById('loader-wrap');
     if(loader) loader.style.display = 'none';
 
-    // Bindings
     window.toggleMenu = () => {
         const menu = document.getElementById('mobile-menu-overlay');
         const burger = document.querySelector('.hamburger');
@@ -93,11 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('decrypt-result-state').classList.add('hidden');
     };
     
-    window.switchFanCard = (el) => {
-        document.querySelectorAll('.fan-card').forEach(c => c.style.zIndex = "1"); 
-        el.style.zIndex = "20";
-    };
-    
     window.restartQuiz = () => startQuiz();
     
     window.showQuotesBlock = () => {
@@ -107,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.goToDecryptInput = () => {
         document.getElementById('quiz-modal').classList.add('hidden');
-        document.getElementById('decrypt-modal').classList.remove('hidden');
+        document.getElementById('decrypt-modal').classList.remove('hidden'); 
         window.resetDecrypt();
     };
 
@@ -120,7 +114,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('user-input');
     if(input) input.addEventListener("keypress", (e) => { if (e.key === "Enter") window.handleDecrypt(); });
 
-    // Init
+    const bttBtn = document.getElementById('back-to-top');
+    if (bttBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                bttBtn.classList.add('show');
+            } else {
+                bttBtn.classList.remove('show');
+            }
+        });
+    }
+
+    initInteractiveCube();
+
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && typeof Matter !== 'undefined') {
         gsap.registerPlugin(ScrollTrigger);
         
@@ -139,12 +145,145 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function initInteractiveCube() {
+    const cubeWrapper = document.querySelector('.cube-wrapper');
+    const cube = document.querySelector('.cube');
+    const reloadBtn = document.getElementById('reload-box-btn');
+    if (!cubeWrapper || !cube) return;
+
+    let rot = { x: -15, y: 25 };         
+    let targetRot = { x: -15, y: 25 };   
+    let state = { z: 0, scale: 1 }; 
+    
+    let isDragging = false;
+    let isReloading = false;
+    let prevMouse = { x: 0, y: 0 };
+
+    const getBaseZ = () => window.innerWidth <= 768 ? -50 : 0;
+
+    const onDown = (e) => {
+        if (isReloading || !e.target.closest('.cube')) return;
+        isDragging = true;
+        
+        const touch = e.touches ? e.touches[0] : e;
+        prevMouse = { x: touch.clientX, y: touch.clientY };
+        cube.style.cursor = 'grabbing';
+        
+        gsap.killTweensOf(targetRot); 
+    };
+
+    const onMove = (e) => {
+        if (!isDragging || isReloading) return;
+        e.preventDefault(); 
+        
+        const touch = e.touches ? e.touches[0] : e;
+        const dx = touch.clientX - prevMouse.x;
+        const dy = touch.clientY - prevMouse.y;
+        
+        targetRot.y += dx * 0.4;
+        targetRot.x -= dy * 0.4;
+
+        prevMouse = { x: touch.clientX, y: touch.clientY };
+    };
+
+    const onUp = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        cube.style.cursor = 'grab';
+    };
+
+    cubeWrapper.addEventListener('mousedown', onDown);
+    document.addEventListener('mousemove', onMove, { passive: false });
+    document.addEventListener('mouseup', onUp);
+    cubeWrapper.addEventListener('touchstart', onDown, { passive: false });
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onUp);
+
+    if (reloadBtn) {
+        reloadBtn.addEventListener('click', () => {
+            if (isReloading) return;
+            isReloading = true;
+            isDragging = false;
+
+            let finalRotX = targetRot.x;
+            let finalRotY = targetRot.y;
+
+            gsap.to(state, {
+                z: -1500,
+                scale: 0,
+                duration: 0.7,
+                ease: "power2.in"
+            });
+
+            gsap.to(targetRot, {
+                x: targetRot.x + 360,
+                y: targetRot.y - 360,
+                duration: 0.7,
+                ease: "power2.in",
+                onComplete: () => {
+                    state.z = -500; 
+                    rot.x = finalRotX;
+                    rot.y = finalRotY;
+                    targetRot.x = finalRotX;
+                    targetRot.y = finalRotY;
+                    
+                    gsap.to(state, {
+                        z: 0,
+                        scale: 1,
+                        duration: 1.2,
+                        ease: "expo.out",
+                        onComplete: () => {
+                            isReloading = false;
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    function loopCube() {
+        if (!isDragging && !isReloading) {
+            targetRot.y += 0.05;
+        }
+        
+        rot.x += (targetRot.x - rot.x) * 0.1;
+        rot.y += (targetRot.y - rot.y) * 0.1;
+
+        cube.style.transform = `translateZ(${getBaseZ() + state.z}px) scale(${state.scale}) rotateX(${rot.x}deg) rotateY(${rot.y}deg)`;
+        requestAnimationFrame(loopCube);
+    }
+    loopCube();
+}
+
+
 function initFogAnimation() {
-    gsap.from(".fog-header", { scrollTrigger: { trigger: "#knowledge-section", start: "top 80%" }, y: 50, opacity: 0, duration: 1 });
-    gsap.from(".fog-card", { scrollTrigger: { trigger: ".fog-grid", start: "top 80%" }, y: 50, opacity: 0, duration: 1, stagger: 0.2 });
-    gsap.from(".timeline-line", { scrollTrigger: { trigger: ".timeline-container", start: "top 80%" }, height: 0, duration: 1.5, ease: "none" });
-    gsap.utils.toArray(".timeline-item").forEach(item => { gsap.from(item, { scrollTrigger: { trigger: item, start: "top 85%" }, y: 30, opacity: 0, duration: 0.8 }); });
-    gsap.from(".sos-tactical-card", { scrollTrigger: { trigger: ".sos-section", start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.2 });
+    window.addEventListener('load', () => ScrollTrigger.refresh());
+
+    const tl = gsap.timeline({ scrollTrigger: { trigger: "#knowledge-section", start: "top 80%" } });
+    
+    tl.fromTo(".fog-header", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1 });
+    
+    gsap.fromTo(".fog-card", 
+        { y: 50, opacity: 0 }, 
+        { scrollTrigger: { trigger: ".fog-grid", start: "top 80%" }, y: 0, opacity: 1, duration: 1, stagger: 0.2 }
+    );
+    
+    gsap.fromTo(".timeline-line", 
+        { height: 0 }, 
+        { scrollTrigger: { trigger: ".timeline-container", start: "top 80%" }, height: "100%", duration: 1.5, ease: "none" }
+    );
+    
+    gsap.utils.toArray(".timeline-item").forEach(item => { 
+        gsap.fromTo(item, 
+            { y: 30, opacity: 0 }, 
+            { scrollTrigger: { trigger: item, start: "top 85%" }, y: 0, opacity: 1, duration: 0.8 }
+        ); 
+    });
+    
+    gsap.fromTo(".sos-tactical-card", 
+        { y: 50, opacity: 0 }, 
+        { scrollTrigger: { trigger: ".sos-section", start: "top 80%" }, y: 0, opacity: 1, duration: 0.8, stagger: 0.2 }
+    );
 }
 
 function initParallaxImages() {
@@ -192,12 +331,20 @@ function renderQuiz() {
         return;
     }
     const d = QUIZ_DATA[currentQ];
+    
+    // ★ 關鍵修復：用 <span> 把文字包起來，這樣 <br> 標籤在 Flex 容器裡才不會失效，保證排版絕對精準對稱！
     container.innerHTML = `
         <div style="font-size:5rem; font-family:serif; margin-bottom:10px; color:#ddd;">${(currentQ + 1).toString().padStart(2, '0')}</div>
-        <h3 style="font-size:1.3rem; margin-bottom:30px; color:#333; line-height: 1.6; text-align: left;">${d.q}</h3>
+        <h3 style="font-size:1.3rem; margin-bottom:30px; color:#333; line-height: 1.6; text-align: center; display: flex; align-items: center; justify-content: center; height: 85px;">
+            <span>${d.q}</span>
+        </h3>
         <div class="quiz-options">
-            <button class="quiz-option-btn" onclick="window.answer(1)">${d.a1}</button>
-            <button class="quiz-option-btn" onclick="window.answer(2)">${d.a2}</button>
+            <button class="quiz-option-btn" onclick="window.answer(1)">
+                <span>${d.a1}</span>
+            </button>
+            <button class="quiz-option-btn" onclick="window.answer(2)">
+                <span>${d.a2}</span>
+            </button>
         </div>
     `;
 }
@@ -227,7 +374,6 @@ function initHybridPhysics() {
     const DOLL_SIZE = 120; 
     
     for (let i = 0; i < 8; i++) {
-        // 碰撞範圍 1.35
         const physicsRadius = (DOLL_SIZE / 2) * 1.35;
         const body = Bodies.circle(Math.random() * w, Math.random() * h, physicsRadius, { 
             restitution: 0.6, 
@@ -288,19 +434,12 @@ function initHybridPhysics() {
     dollRenderer.outputColorSpace = THREE.SRGBColorSpace; 
     container.appendChild(dollRenderer.domElement);
 
-    // ★ 燈光大升級：增加環境光、主光，並加上「背側補光」消滅死黑陰影 ★
-    const ambientLight = new THREE.AmbientLight(0xffffff, 2.5); // 提高整體環境亮度
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0); 
     dollScene.add(ambientLight);
     
-    // 主光源 (從右上前方打光)
-    const mainLight = new THREE.DirectionalLight(0xffffff, 3.0); 
-    mainLight.position.set(200, 300, 500); 
-    dollScene.add(mainLight);
-
-    // 補光 (從左下後方打光，照亮原本的黑色陰影區)
-    const fillLight = new THREE.DirectionalLight(0xffffff, 1.8);
-    fillLight.position.set(-300, -100, -300);
-    dollScene.add(fillLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5); 
+    dirLight.position.set(200, 300, 500); 
+    dollScene.add(dirLight);
 
     dollMeshes = [];
     const loader = new GLTFLoader();
@@ -314,17 +453,13 @@ function initHybridPhysics() {
         
         model.position.sub(center); 
 
-        // 材質微調：讓光線更容易穿透與反射
         model.traverse((child) => {
             if (child.isMesh) {
                 child.material.transparent = true;
                 child.material.opacity = 0.85; 
                 child.material.color.setHex(0x00999a); 
-                
-                // 降低金屬感，讓顏色更明亮純粹，不會吸收太多光線
-                child.material.roughness = 0.15; 
-                child.material.metalness = 0.1; 
-                
+                child.material.roughness = 0.25; 
+                child.material.metalness = 0.4; 
                 child.material.depthWrite = false; 
                 child.material.needsUpdate = true;
             }
@@ -400,7 +535,6 @@ function stopHybridPhysics() {
     isMatterActive = false;
 }
 
-// --- Top Three.js Cards ---
 function initThree() {
     const container = document.getElementById('webgl-container');
     if (!container) return;
@@ -414,12 +548,10 @@ function initThree() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
     
-    // 首頁卡片的光線也順便提亮一點點
-    const ambient = new THREE.AmbientLight(0xffffff, 1.2); scene.add(ambient);
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2); dirLight.position.set(500, 500, 1000); scene.add(dirLight);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambient);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8); dirLight.position.set(500, 500, 1000); scene.add(dirLight);
 
     const textureLoader = new THREE.TextureLoader();
-    createBackgroundParticles();
     introGroup = new THREE.Group(); scene.add(introGroup);
     
     const loadTexture = (path) => {
@@ -434,6 +566,7 @@ function initThree() {
         const backTex = loadTexture(backPath);
 
         const cardGroup = createDoubleSidedCard(frontTex, backTex);
+        cardGroup.userData.index = i; 
         resetIntroCard(cardGroup, true);
         introGroup.add(cardGroup);
     }
@@ -465,6 +598,7 @@ function createDoubleSidedCard(front, back) {
     f.position.z = depth / 2 + 0.5; 
     grp.add(f);
 
+    // ★ 修復：new Mesh -> new THREE.Mesh，解決 3D 背景報錯問題
     const b = new THREE.Mesh(faceGeo, new THREE.MeshBasicMaterial({ 
         map: back, color: 0xffffff, transparent: true,
         polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2
@@ -494,37 +628,102 @@ function fixUVs(geo) {
 }
 
 function resetIntroCard(card, isInit = false) { 
-    card.position.x = (Math.random()-0.5)*window.innerWidth*0.8; 
-    card.position.y = isInit ? (Math.random() - 0.5) * window.innerHeight : -window.innerHeight*0.8; 
-    card.position.z = Math.random() * -600 - 100; 
-    card.rotation.x = Math.random()*Math.PI; 
-    card.rotation.y = Math.random()*Math.PI; 
-    
-    card.userData = { 
-        speed: 0.3 + Math.random() * 0.5, 
-        rotSpeedX: (Math.random() - 0.5) * 0.003, 
-        rotSpeedY: (Math.random() - 0.5) * 0.003  
-    }; 
-}
+    const uniqueZ = -150 - (Math.random() * 200); 
 
-function createBackgroundParticles() { 
-    const geo = new THREE.BufferGeometry(); 
-    const v = []; 
-    for(let i=0; i<200; i++) v.push((Math.random()-0.5)*2000,(Math.random()-0.5)*2000,(Math.random()-0.5)*2000); 
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(v, 3)); 
-    particleSystem = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0x888888, size: 5 })); 
-    scene.add(particleSystem); 
+    if (isInit) {
+        card.position.x = 0; 
+        card.position.y = 0; 
+        card.position.z = uniqueZ;
+
+        const aspect = window.innerWidth / window.innerHeight;
+        const t = card.userData.index / INTRO_COUNT;
+        const theta = Math.atan2(Math.sin(t * Math.PI * 2) * aspect, Math.cos(t * Math.PI * 2));
+
+        const baseBurstForce = 15 + Math.random() * 15; 
+        const randomDirShuffle = (Math.random() - 0.5) * 0.3;
+
+        card.userData.vx = Math.cos(theta + randomDirShuffle) * baseBurstForce;
+        card.userData.vy = Math.sin(theta + randomDirShuffle) * baseBurstForce;
+        
+        card.userData.baseSpeed = 0.5 + Math.random() * 0.5; 
+        card.userData.baseRotX = (Math.random() - 0.5) * 0.006; 
+        card.userData.baseRotY = (Math.random() - 0.5) * 0.006;  
+        
+        card.userData.burstRotX = (Math.random() - 0.5) * 0.15;
+        card.userData.burstRotY = (Math.random() - 0.5) * 0.15;
+    } else {
+        card.position.x = (Math.random() - 0.5) * window.innerWidth * 0.9;
+        card.position.y = -window.innerHeight * 0.8 - (Math.random() * 200); 
+        card.position.z = uniqueZ;
+        
+        card.userData.vx = 0; 
+        card.userData.vy = 0;
+        card.userData.burstRotX = 0;
+        card.userData.burstRotY = 0;
+        
+        card.userData.baseSpeed = 0.5 + Math.random() * 0.5; 
+        card.userData.baseRotX = (Math.random() - 0.5) * 0.006; 
+        card.userData.baseRotY = (Math.random() - 0.5) * 0.006;  
+    }
+    
+    card.rotation.x = Math.random() * Math.PI; 
+    card.rotation.y = Math.random() * Math.PI; 
 }
 
 function animate() { 
     requestAnimationFrame(animate); 
-    if(introGroup) introGroup.children.forEach(c => { 
-        c.position.y += c.userData.speed; 
-        c.rotation.x += c.userData.rotSpeedX; 
-        c.rotation.y += c.userData.rotSpeedY; 
-        if(c.position.y > window.innerHeight*1.2) resetIntroCard(c); 
-    }); 
-    if(particleSystem) particleSystem.rotation.y += 0.001; 
+    
+    if(introGroup) {
+        const edgeX = window.innerWidth * 0.48; 
+        const cards = introGroup.children;
+        
+        const MIN_DIST = 220; 
+        for (let i = 0; i < cards.length; i++) {
+            for (let j = i + 1; j < cards.length; j++) {
+                const c1 = cards[i];
+                const c2 = cards[j];
+                
+                const dx = c1.position.x - c2.position.x;
+                const dy = c1.position.y - c2.position.y;
+                const dz = c1.position.z - c2.position.z;
+                const distSq = dx*dx + dy*dy + dz*dz;
+                
+                if (distSq < MIN_DIST * MIN_DIST && distSq > 0) {
+                    const dist = Math.sqrt(distSq);
+                    const force = (MIN_DIST - dist) * 0.001; 
+                    
+                    c1.userData.vx += (dx / dist) * force;
+                    c1.userData.vy += (dy / dist) * force;
+                    c2.userData.vx -= (dx / dist) * force;
+                    c2.userData.vy -= (dy / dist) * force;
+                }
+            }
+        }
+
+        cards.forEach(c => { 
+            c.position.x += c.userData.vx;
+            c.position.y += c.userData.vy;
+
+            c.userData.vx *= 0.93;
+            c.userData.vy *= 0.93;
+            c.userData.burstRotX *= 0.95;
+            c.userData.burstRotY *= 0.95;
+
+            c.position.y += c.userData.baseSpeed; 
+            c.rotation.x += c.userData.baseRotX + c.userData.burstRotX; 
+            c.rotation.y += c.userData.baseRotY + c.userData.burstRotY; 
+
+            if (c.position.x > edgeX) {
+                c.position.x -= (c.position.x - edgeX) * 0.05;
+            } else if (c.position.x < -edgeX) {
+                c.position.x -= (c.position.x + edgeX) * 0.05;
+            }
+
+            if(c.position.y > window.innerHeight * 1.5) {
+                resetIntroCard(c, false); 
+            }
+        }); 
+    }
     
     camera.lookAt(scene.position); 
     renderer.render(scene, camera); 
