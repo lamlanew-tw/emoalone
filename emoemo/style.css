@@ -57,18 +57,23 @@ html {
 }
 .logo-container {
   position: absolute;
-  left: 40px;
+  left: 30px;
   top: 60%;
   transform: translateY(-50%);
-  width: 80px;
+  width: 85px;
   z-index: 201;
   pointer-events: auto;
   cursor: pointer;
+  transition: transform 0.2s;
+}
+.logo-container:active {
+  transform: translateY(-50%) scale(0.95);
 }
 .logo-img {
   width: 100%;
   display: block;
 }
+
 .nav-tags {
   display: flex;
   gap: 15px;
@@ -254,7 +259,6 @@ html {
   mix-blend-mode: difference;
   z-index: 5;
 }
-
 .images {
   position: relative;
   width: 100%;
@@ -304,22 +308,26 @@ html {
 
 /* Psychology */
 #knowledge-section {
+  display: block;
+  width: 100%;
   padding: 180px 20px;
   position: relative;
   z-index: 50;
   background-color: #000;
 }
 .fog-container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
 }
 .knowledge-block {
   margin-bottom: 200px;
+  width: 100%;
 }
-
 .section-divider {
   text-align: center;
   margin-bottom: 30px;
+  width: 100%;
 }
 .divider-text {
   color: var(--color-primary);
@@ -344,6 +352,7 @@ html {
 .fog-header {
   text-align: center;
   margin-bottom: 80px;
+  opacity: 1;
 }
 .fog-title {
   font-size: 3.5rem;
@@ -381,10 +390,9 @@ html {
   overflow: hidden;
   transition: 0.4s;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-  opacity: 1 !important;
-  transform: none !important;
-  pointer-events: auto !important;
   cursor: pointer;
+  pointer-events: auto;
+  opacity: 1;
 }
 .fog-card:hover {
   border-color: var(--color-primary);
@@ -419,12 +427,12 @@ html {
   align-items: center;
   text-align: center;
   filter: blur(2px);
-  opacity: 0.8 !important;
+  opacity: 0.8;
   transition: 0.3s;
 }
 .fog-card:hover .fog-content-layer {
-  filter: blur(0px) !important;
-  opacity: 1 !important;
+  filter: blur(0px);
+  opacity: 1;
 }
 .fog-content-layer h3 {
   font-size: 2.2rem;
@@ -463,16 +471,13 @@ html {
   text-align: justify;
 }
 
-/* ========================================================================= */
-/* ★★★ Timeline (六大循環 - 修復底部時間線凸出擋住的問題) ★★★ */
-/* ========================================================================= */
-
-/* ★ 修正：將 padding-bottom 改為 margin-bottom，讓時間線正確收尾不超出 ★ */
+/* Timeline */
 .timeline-container {
   position: relative;
-  max-width: 1100px;
-  margin: 0 auto 100px auto; /* ★ 底部保留 100px 實體空白推開下方區塊 ★ */
-  padding: 20px 0 0 0; /* 底部 Padding 歸零，讓線條停止在最後一個項目 */
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto 100px auto;
+  padding: 20px 20px 0 20px;
 }
 .timeline-line {
   position: absolute;
@@ -480,42 +485,45 @@ html {
   bottom: 0;
   left: 50%;
   width: 2px;
+  margin-left: -1px;
   background: linear-gradient(
     to bottom,
     transparent,
-    var(--color-primary),
+    var(--color-primary) 5%,
+    var(--color-primary) 95%,
     transparent
   );
-  transform: translateX(-50%);
   box-shadow: 0 0 10px var(--color-primary);
   z-index: 1;
 }
-
-/* 設定安全距離：左右 padding 保證黑框絕對撞不到中間紅線 */
 .timeline-item {
   position: relative;
   width: 50%;
-  box-sizing: border-box;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   z-index: 2;
+  opacity: 1;
+}
+.timeline-item:last-child {
+  margin-bottom: 0;
 }
 .timeline-item.left {
   left: 0;
-  padding-right: 50px;
-  padding-left: 10px;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 40px;
 }
 .timeline-item.right {
   left: 50%;
-  padding-left: 50px;
-  padding-right: 10px;
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 40px;
 }
-
-/* 圓點對齊中線 */
 .timeline-dot {
   position: absolute;
-  top: 25px;
+  top: 30px;
   width: 16px;
   height: 16px;
+  box-sizing: border-box;
   background: #000;
   border: 3px solid var(--color-primary);
   border-radius: 50%;
@@ -528,31 +536,19 @@ html {
 .timeline-item.right .timeline-dot {
   left: -8px;
 }
-
-/* 強制加寬，並縮小上下 Padding 避免變高 */
 .timeline-content {
   background: rgba(20, 20, 20, 0.95);
   width: 100%;
   max-width: 480px;
-  padding: 20px 30px;
-  border-radius: 8px;
+  padding: 30px;
+  border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  position: relative;
+  box-sizing: border-box;
   transition: 0.3s;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
   pointer-events: auto;
   text-align: left;
 }
-/* 讓框框確實靠近中線，利用外層 padding 擋住 */
-.timeline-item.left .timeline-content {
-  margin-left: auto;
-  margin-right: 0;
-}
-.timeline-item.right .timeline-content {
-  margin-left: 0;
-  margin-right: auto;
-}
-
 .timeline-content:hover {
   border-color: var(--color-primary);
   transform: scale(1.02);
@@ -561,26 +557,26 @@ html {
   display: inline-block;
   background: #333;
   color: #fff;
-  padding: 3px 12px;
+  padding: 5px 15px;
   border-radius: 4px;
   font-family: var(--font-eng);
-  font-size: 0.9rem;
-  margin-bottom: 8px;
+  font-size: 1rem;
+  margin-bottom: 12px;
   font-weight: bold;
 }
 .timeline-content h4 {
   color: #fff;
-  margin: 0 0 8px;
-  font-size: 1.4rem;
+  margin: 0 0 10px;
+  font-size: 1.5rem;
   font-weight: bold;
+  letter-spacing: 1px;
 }
 .timeline-content p {
   color: #ccc;
-  font-size: 1.05rem;
-  line-height: 1.5;
+  font-size: 1.1rem;
+  line-height: 1.6;
   margin: 0;
 }
-
 .timeline-dot.red-dot {
   border-color: var(--color-accent);
   box-shadow: 0 0 15px var(--color-accent);
@@ -592,7 +588,6 @@ html {
 .step-badge.red {
   background: var(--color-accent);
 }
-/* ========================================================================= */
 
 /* SOS */
 .sos-cards-wrapper {
@@ -611,8 +606,7 @@ html {
   transition: 0.3s;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
   pointer-events: auto;
-  opacity: 1 !important;
-  transform: none !important;
+  opacity: 1;
 }
 .sos-tactical-card:hover {
   border-color: var(--color-primary);
@@ -637,21 +631,21 @@ html {
   flex: 1;
   display: flex;
   align-items: center;
-  padding: 20px 30px;
+  padding: 25px 35px;
   gap: 25px;
 }
 .big-letter {
-  font-size: 4rem;
+  font-size: 4.5rem;
   font-weight: 900;
   color: var(--color-primary);
   opacity: 1;
-  min-width: 60px;
+  min-width: 70px;
   text-align: center;
   text-shadow: 0 0 20px rgba(0, 153, 154, 0.4);
 }
 .sos-info h4 {
   color: #fff;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   margin: 0 0 8px;
   font-weight: bold;
 }
@@ -670,54 +664,116 @@ html {
   font-size: 1.1rem;
 }
 
-/* Fan Cards */
-#card-fan {
-  padding: 100px 0 180px 0;
-}
-.fan-container {
+/* ★★★ 3D 鎖定旋轉巨大方塊區塊 ★★★ */
+#cube-section {
   position: relative;
-  width: 900px;
-  max-width: 100%;
-  height: 600px;
+  width: 100%;
+  height: 100vh;
+  min-height: 700px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+#reload-box-btn {
+  position: absolute;
+  left: 10%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  color: #fff;
+  padding: 10px 24px;
+  font-family: var(--font-eng);
+  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 50;
+  transition: all 0.3s ease;
+  border-radius: 50px;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reload-icon {
+  font-size: 1.1rem;
+}
+#reload-box-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* 修正 perspective 為 1000px 確保完美正方體不變形 */
+.cube-wrapper {
+  position: absolute;
+  left: 60%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 450px;
+  height: 450px;
+  perspective: 1000px;
+  pointer-events: none;
+}
+
+.cube {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-style: preserve-3d;
+  pointer-events: auto;
+  cursor: grab;
+}
+.cube:active {
+  cursor: grabbing;
+}
+
+.cube-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #050505;
+  border: none;
+  border-radius: 0;
+  overflow: hidden;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
-  margin: 0 auto;
+  align-items: center;
+  user-select: none;
+  -webkit-user-drag: none;
+  backface-visibility: hidden;
 }
-.fan-card {
-  width: 350px;
-  height: auto;
-  background-color: transparent;
-  position: absolute;
-  bottom: 0;
-  transition: 0.5s;
-  transform-origin: bottom center;
-  cursor: pointer;
-  border-radius: 12px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-  pointer-events: auto;
-}
-.fan-card img {
+.cube-face img {
   width: 100%;
-  display: block;
-  border-radius: 12px;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  filter: brightness(0.9);
+  transition: 0.3s;
 }
-.fan-card.left {
-  transform: translateX(-220px) rotate(-10deg);
-  z-index: 1;
+.cube-face:hover img {
+  filter: brightness(1.1);
 }
-.fan-card.center {
-  transform: translateX(0) rotate(0deg) translateY(-40px);
-  z-index: 2;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+
+.cube-face.front {
+  transform: rotateY(0deg) translateZ(225px);
 }
-.fan-card.right {
-  transform: translateX(220px) rotate(10deg);
-  z-index: 1;
+.cube-face.right {
+  transform: rotateY(90deg) translateZ(225px);
 }
-.fan-card:hover {
-  z-index: 20;
-  transform: translateY(-80px) scale(1.1) rotate(0deg);
+.cube-face.back {
+  transform: rotateY(180deg) translateZ(225px);
+}
+.cube-face.left {
+  transform: rotateY(-90deg) translateZ(225px);
+}
+.cube-face.top {
+  transform: rotateX(90deg) translateZ(225px);
+}
+.cube-face.bottom {
+  transform: rotateX(-90deg) translateZ(225px);
 }
 
 /* QUIZ ENTRY */
@@ -825,14 +881,6 @@ html {
   align-items: center;
   gap: 15px;
 }
-.footer-logo {
-  width: 100px;
-  opacity: 0.8;
-  transition: opacity 0.3s;
-}
-.footer-logo:hover {
-  opacity: 1;
-}
 .copyright {
   color: #555;
   font-size: 0.8rem;
@@ -841,9 +889,34 @@ html {
   margin: 0;
 }
 
-/* Loader */
-#loader-wrap {
-  display: none !important;
+#back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 999;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: 0.3s ease;
+}
+#back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+#back-to-top:hover {
+  background-color: var(--color-accent);
+  transform: translateY(-5px);
 }
 
 /* Modals */
@@ -874,6 +947,12 @@ html {
   transform: scale(0.8);
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+/* ★ 絕對鎖定大白框高度：從 min-height 改為 height，保證切換題目時外框不跳動 */
+.modal-content.quiz-style {
+  height: 600px;
+  justify-content: center;
+}
 .modal-overlay:not(.hidden) .modal-content {
   transform: scale(1);
 }
@@ -903,6 +982,21 @@ html {
   overflow: hidden;
   color: #fff;
 }
+
+/* ★ 內容補上 Flex 讓他在 600px 的框裡完美垂直置中 */
+#quiz-question-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+#quiz-question-block h3 span {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
 .result-scroll-wrapper {
   flex: 1;
   overflow-y: auto;
@@ -1047,22 +1141,28 @@ html {
 .quiz-options {
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 10px 0;
   gap: 15px;
   width: 100%;
 }
+
+/* ★ 絕對鎖定按鈕高度 (130px) 防跳動 */
 .quiz-option-btn {
-  height: auto;
-  min-height: 60px;
+  height: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 15px 25px;
   background-color: #00999a;
   color: white;
   border-radius: 15px;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 1px;
   border: none;
   cursor: pointer;
-  line-height: 1.5;
-  text-align: left;
+  line-height: 1.6;
+  text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .quiz-option-btn:hover {
@@ -1070,22 +1170,14 @@ html {
   box-shadow: 0 5px 15px rgba(0, 153, 154, 0.4);
 }
 
+/* ★ 確保 Flex 中被斷行的文字絕對置中 */
+.quiz-option-btn span {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
 /* 情勒金句對話框 */
-.quotes-title {
-  color: #c23e38;
-  font-size: 2rem;
-  font-weight: 900;
-  margin: 0 0 10px;
-  text-align: center;
-  text-shadow: 0 0 15px rgba(194, 62, 56, 0.3);
-}
-.quotes-subtitle {
-  color: #888;
-  font-size: 1.1rem;
-  margin-bottom: 40px;
-  text-align: center;
-  letter-spacing: 2px;
-}
 .chat-quotes-container {
   display: flex;
   flex-direction: column;
@@ -1133,18 +1225,6 @@ html {
 }
 .modal-content.decrypt-style .close-btn:hover {
   color: #fff;
-}
-.modal-title {
-  font-size: 1.8rem;
-  color: #fff;
-  margin: 0 0 10px;
-  font-weight: 900;
-}
-.modal-desc {
-  color: #888;
-  font-size: 1rem;
-  margin-bottom: 30px;
-  letter-spacing: 1px;
 }
 .input-container-enhanced {
   display: flex;
@@ -1208,7 +1288,7 @@ html {
   }
 }
 
-/* ★★★ RWD Mobile 自適應調整 ★★★ */
+/* ★★★ RWD Mobile 手機版 ★★★ */
 @media (max-width: 768px) {
   .desktop-only {
     display: none;
@@ -1223,28 +1303,26 @@ html {
     transform: translateY(-50%);
     z-index: 203;
   }
+
   .logo-container {
     left: 20px;
-    width: 110px;
+    width: 70px;
   }
 
   .section-padding {
     padding: 80px 0;
   }
   #knowledge-section {
-    padding: 100px 20px;
+    padding: 80px 20px;
   }
   .knowledge-block {
-    margin-bottom: 120px;
-  }
-  #card-fan {
-    padding: 80px 0 120px 0;
-  }
-  .full-width-section {
-    padding: 100px 0;
-    min-height: 500px;
+    margin-bottom: 60px;
   }
 
+  .full-width-section {
+    padding: 80px 0;
+    min-height: 500px;
+  }
   #section-2 {
     min-height: auto;
     margin-bottom: 80px;
@@ -1268,44 +1346,43 @@ html {
     border-radius: 8px;
   }
 
-  .fog-title {
-    font-size: 2.5rem;
-  }
-  .fog-content-layer {
-    filter: blur(0px) !important;
-    opacity: 1 !important;
-  }
-
-  /* 手機版時間線修復 */
   .timeline-container {
-    margin: 0 auto 80px auto;
-    padding: 0;
+    padding: 0 10px;
+    margin: 0 auto 30px auto;
+    width: 100%;
+    box-sizing: border-box;
   }
   .timeline-line {
-    left: 20px;
+    left: 40px;
+    width: 2px;
+    margin: 0;
+    margin-left: -1px;
+    transform: none;
   }
+  .timeline-dot {
+    left: 31px !important;
+    right: auto !important;
+    top: 25px !important;
+    margin: 0;
+    transform: none !important;
+  }
+
   .timeline-item {
     width: 100%;
-    padding: 10px 10px 10px 50px !important;
-    text-align: left !important;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
   .timeline-item.left,
   .timeline-item.right {
-    left: 0 !important;
-    text-align: left !important;
+    left: 0;
+    display: block;
+    padding-left: 70px !important;
+    padding-right: 0 !important;
+    text-align: left;
   }
-  .timeline-dot {
-    left: 12px !important;
-    right: auto !important;
-    top: 25px;
-  }
-
   .timeline-content {
     width: 100% !important;
     max-width: none !important;
-    margin: 0 !important;
-    padding: 25px !important;
+    padding: 20px !important;
   }
 
   .sos-body {
@@ -1323,21 +1400,66 @@ html {
     grid-template-columns: 1fr;
   }
 
-  .fan-container {
-    height: 400px;
+  #cube-section {
+    min-height: 60vh;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0;
     align-items: center;
   }
-  .fan-card.left {
-    transform: translateX(-80px) rotate(-10deg) scale(0.8);
+
+  #reload-box-btn {
+    position: relative;
+    top: auto;
+    left: auto;
+    align-self: flex-start;
+    margin-left: 20px;
+    margin-bottom: 40px;
+    transform: none;
+    z-index: 50;
   }
-  .fan-card.right {
-    transform: translateX(80px) rotate(10deg) scale(0.8);
+
+  .cube-wrapper {
+    position: relative;
+    left: 0;
+    top: 0;
+    transform: none;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto;
+    perspective: 1000px;
   }
-  .fan-card.center {
-    transform: translateX(0) rotate(0deg) translateY(0);
+
+  .cube {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: none;
+    margin: 0;
   }
-  .fan-card {
-    width: 200px;
+  .cube-face {
+    width: 280px;
+    height: 280px;
+  }
+  .cube-face.front {
+    transform: rotateY(0deg) translateZ(140px);
+  }
+  .cube-face.right {
+    transform: rotateY(90deg) translateZ(140px);
+  }
+  .cube-face.back {
+    transform: rotateY(180deg) translateZ(140px);
+  }
+  .cube-face.left {
+    transform: rotateY(-90deg) translateZ(140px);
+  }
+  .cube-face.top {
+    transform: rotateX(90deg) translateZ(140px);
+  }
+  .cube-face.bottom {
+    transform: rotateX(-90deg) translateZ(140px);
   }
 
   .result-sub-label2 {
@@ -1349,5 +1471,12 @@ html {
   }
   .result-footer {
     flex-direction: column;
+  }
+  #back-to-top {
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
   }
 }
