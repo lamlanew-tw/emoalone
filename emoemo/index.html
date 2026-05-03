@@ -41,7 +41,11 @@
     </div>
 
     <header id="main-nav">
-      <div class="logo-container">
+      <div
+        class="logo-container"
+        onclick="window.location.reload();"
+        title="重新載入頁面"
+      >
         <img src="./img/logo2.png" alt="Logo" class="logo-img" />
       </div>
 
@@ -64,6 +68,7 @@
       <a href="#quiz-entry" onclick="window.toggleMenu()">測驗</a>
     </div>
 
+    <!-- Intro 區塊 -->
     <section id="intro">
       <div id="webgl-container"></div>
       <div class="intro-text-box">
@@ -79,6 +84,7 @@
       </div>
     </section>
 
+    <!-- 一般內容區 -->
     <div id="content">
       <section id="section-2">
         <h1 class="text">EMOTION</h1>
@@ -102,9 +108,8 @@
         <div class="fog-container">
           <div class="knowledge-block fog-block">
             <div class="fog-header">
-              <h2 class="fog-title">愛，不該是一場迷霧</h2>
+              <h2 class="fog-title">愛<br />不該是一場勒索</h2>
               <p class="fog-subtitle">識別情緒勒索的 F.O.G. 迷陣</p>
-              <p class="fog-hint">（ 滑鼠懸停撥開迷霧 ）</p>
             </div>
             <div class="fog-grid">
               <div class="fog-card">
@@ -113,9 +118,9 @@
                   <h3>Fear</h3>
                   <span class="chn">恐懼</span>
                   <div class="fog-divider"></div>
-                  <p class="quote">「你如果敢走，我們就完了。」</p>
+                  <p class="quote">「你如果敢走，我們就完了」</p>
                   <p class="desc">
-                    利用你的不安。你不是不想拒絕，你是<strong>「不敢」</strong>。
+                    利用你的不安，你不是不想拒絕，你是<strong>「不敢」</strong>
                   </p>
                 </div>
               </div>
@@ -127,7 +132,7 @@
                   <div class="fog-divider"></div>
                   <p class="quote">「我養你這麼大，你這點忙都不幫？」</p>
                   <p class="desc">
-                    利用你的善良。將他的需求包裝成你的<strong>「義務」</strong>。
+                    利用你的善良將他的需求包裝成你的<strong>「義務」</strong>
                   </p>
                 </div>
               </div>
@@ -137,9 +142,11 @@
                   <h3>Guilt</h3>
                   <span class="chn">罪惡感</span>
                   <div class="fog-divider"></div>
-                  <p class="quote">「沒關係，反正我就是沒人愛。」</p>
+                  <p class="quote">「沒關係，反正我就是沒人愛」</p>
                   <p class="desc">
-                    利用你的愧疚。扮演受害者，讓你覺得<strong>「都是我的錯」</strong>。
+                    利用你的愧疚扮演受害者，讓你覺得<strong
+                      >「都是我的錯」</strong
+                    >
                   </p>
                 </div>
               </div>
@@ -158,7 +165,7 @@
                 <div class="timeline-content">
                   <div class="step-badge">01</div>
                   <h4>要求 (Demand)</h4>
-                  <p>這通常不是「詢問」，而是「命令」。</p>
+                  <p>這通常不是「詢問」，而是「命令」</p>
                 </div>
               </div>
               <div class="timeline-item right">
@@ -166,7 +173,7 @@
                 <div class="timeline-content">
                   <div class="step-badge">02</div>
                   <h4>抵抗 (Resistance)</h4>
-                  <p>你覺得哪裡怪怪的，試著婉拒。</p>
+                  <p>你覺得哪裡怪怪的，試著婉拒</p>
                 </div>
               </div>
               <div class="timeline-item left">
@@ -174,7 +181,7 @@
                 <div class="timeline-content">
                   <div class="step-badge">03</div>
                   <h4>施壓 (Pressure)</h4>
-                  <p>對方開始跳針：「你變了」。</p>
+                  <p>對方開始跳針：「你變了」</p>
                 </div>
               </div>
               <div class="timeline-item right warning-step">
@@ -182,7 +189,7 @@
                 <div class="timeline-content highlight-content">
                   <div class="step-badge red">04</div>
                   <h4>威脅 (Threat)</h4>
-                  <p><strong>關鍵轉折。</strong>如果不順意，後果很嚴重。</p>
+                  <p>如果不順意，後果很嚴重</p>
                 </div>
               </div>
               <div class="timeline-item left">
@@ -190,7 +197,7 @@
                 <div class="timeline-content">
                   <div class="step-badge">05</div>
                   <h4>順從 (Compliance)</h4>
-                  <p>為了停止爭吵，你投降了。</p>
+                  <p>為了停止爭吵，你投降了</p>
                 </div>
               </div>
               <div class="timeline-item right">
@@ -198,7 +205,7 @@
                 <div class="timeline-content">
                   <div class="step-badge">06</div>
                   <h4>重複 (Repetition)</h4>
-                  <p>對方學會了，下次繼續。</p>
+                  <p>對方學會了，下次繼續</p>
                 </div>
               </div>
             </div>
@@ -216,7 +223,7 @@
                   <div class="big-letter">S</div>
                   <div class="sos-info">
                     <h4>Stop 停下來</h4>
-                    <p>別急著回話！這不是戰爭。</p>
+                    <p>別急著回話！</p>
                   </div>
                 </div>
               </div>
@@ -226,7 +233,7 @@
                   <div class="big-letter">O</div>
                   <div class="sos-info">
                     <h4>Observe 觀察</h4>
-                    <p>深呼吸，像個局外人。</p>
+                    <p>深呼吸，像個局外人</p>
                   </div>
                 </div>
               </div>
@@ -236,7 +243,7 @@
                   <div class="big-letter">S</div>
                   <div class="sos-info">
                     <h4>Strategize 策略</h4>
-                    <p>溫柔但堅定地守住底線。</p>
+                    <p>堅定地守住底線</p>
                   </div>
                 </div>
               </div>
@@ -248,20 +255,37 @@
         </div>
       </section>
 
-      <section class="section-padding" id="card-fan">
-        <div class="fan-container">
-          <div class="fan-card left" onclick="window.switchFanCard(this)">
-            <img src="./img/公司不缺你一個.png" />
-          </div>
-          <div class="fan-card center" onclick="window.switchFanCard(this)">
-            <img src="./img/別人家的孩子都不會這樣.png" />
-          </div>
-          <div class="fan-card right" onclick="window.switchFanCard(this)">
-            <img src="./img/當不成朋友拉.png" />
+      <!-- ★ 3D 互動方塊：移除多餘容器，保證完美正方體 ★ -->
+      <section id="cube-section">
+        <button id="reload-box-btn">
+          <span class="reload-icon">↻</span> RELOAD BOX
+        </button>
+        <div class="cube-wrapper">
+          <div class="cube">
+            <div class="cube-face front">
+              <img src="./img/1.jpg" alt="Card" />
+            </div>
+            <div class="cube-face back">
+              <img src="./img/2.jpg" alt="Card" />
+            </div>
+            <div class="cube-face right">
+              <img src="./img/3.jpg" alt="Card" />
+            </div>
+            <div class="cube-face left">
+              <img src="./img/4.jpg" alt="Card" />
+            </div>
+            <div class="cube-face top">
+              <img src="./img/5.jpg" alt="Card" />
+            </div>
+            <div class="cube-face bottom">
+              <img src="./img/6.jpg" alt="Card" />
+            </div>
           </div>
         </div>
       </section>
     </div>
+
+    <!-- 獨立滿版玩偶區 -->
     <section class="full-width-section" id="quiz-entry">
       <div id="matter-container"></div>
 
@@ -278,16 +302,6 @@
           <button class="shadow-btn" onclick="window.openQuizModal()">
             開始測驗
           </button>
-          <p
-            style="
-              margin-top: 20px;
-              color: #888;
-              font-size: 0.9rem;
-              text-shadow: 0 0 10px #000;
-            "
-          >
-            ( 滑動游標，撥開漂浮的情緒玩偶 )
-          </p>
         </div>
       </div>
     </section>
@@ -296,11 +310,19 @@
 
     <footer id="simple-footer">
       <div class="footer-inner">
-        <img src="./img/logo2.png" alt="我獨自EMO" class="footer-logo" />
         <p class="copyright">&copy; 2025 我獨自EMO. All Rights Reserved.</p>
       </div>
     </footer>
 
+    <button
+      id="back-to-top"
+      onclick="window.scrollTo({top: 0, behavior: 'smooth'});"
+      title="回到頂部"
+    >
+      ↑
+    </button>
+
+    <!-- Modals -->
     <div id="quiz-modal" class="modal-overlay hidden">
       <div class="modal-content quiz-style">
         <span class="close-btn" onclick="window.closeModal('quiz-modal')"
@@ -389,7 +411,6 @@
         <div id="result-quotes" class="result-scroll-wrapper hidden">
           <h2 class="quotes-title">或許，這些話你也曾聽過...</h2>
           <p class="quotes-subtitle">那些以愛為名的沉重枷鎖</p>
-
           <div class="chat-quotes-container">
             <div class="chat-bubble left">「我這都是為了你好！」</div>
             <div class="chat-bubble right">「這點小事你都不願意幫忙？」</div>
@@ -401,7 +422,6 @@
             </div>
             <div class="chat-bubble left">「你今天敢走，我們之間就完了。」</div>
           </div>
-
           <div class="result-footer" style="margin-top: 50px">
             <button class="result-btn teal" onclick="window.restartQuiz()">
               重新測驗
@@ -417,15 +437,15 @@
       </div>
     </div>
 
+    <!-- 輸入分享 Modal -->
     <div id="decrypt-modal" class="modal-overlay hidden">
       <div class="modal-content decrypt-style">
         <span class="close-btn" onclick="window.closeModal('decrypt-modal')"
           >×</span
         >
-
         <div id="decrypt-input-state">
           <h3 class="modal-title">哪句話，讓你至今依然感到窒息？</h3>
-          <p class="modal-desc">寫下那句將你困在迷霧裡的情緒勒索。</p>
+          <p class="modal-desc">寫下那句將你困在迷霧裡的情緒勒索</p>
           <div class="input-container-enhanced">
             <textarea
               id="user-input"
@@ -440,7 +460,6 @@
             </button>
           </div>
         </div>
-
         <div id="decrypt-result-state" class="hidden">
           <div class="thank-you-box">
             <div class="release-icon">🕊️</div>
