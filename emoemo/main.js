@@ -6,7 +6,10 @@ const { Engine, World, Bodies, Body, Runner, Composite, Mouse, MouseConstraint, 
 
 let scene, camera, renderer, engine, world;
 let introGroup; 
-const INTRO_COUNT = 35; // 背景卡牌數量
+
+// ★ 效能優化：如果是手機/平板，背景卡片數量直接砍半，大幅減輕計算負擔
+const isMobile = window.innerWidth <= 768;
+const INTRO_COUNT = isMobile ? 15 : 35; 
 
 // Hybrid Globals
 let physicsEngine, physicsRunner;
@@ -131,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if(document.getElementById('webgl-container')) initThree();
         
-        // ★ 修復：提早 1200px 觸發 3D 玩偶區塊的載入！這樣滑到時已經下載完成了，不會有延遲感。
         ScrollTrigger.create({
             trigger: "#quiz-entry",
             start: "top bottom+=1200", 
@@ -145,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// ★★★ 3D 互動方塊 (效能優化版) ★★★
 function initInteractiveCube() {
     const cubeWrapper = document.querySelector('.cube-wrapper');
     const cube = document.querySelector('.cube');
@@ -158,12 +161,16 @@ function initInteractiveCube() {
     let isDragging = false;
     let isReloading = false;
     let prevMouse = { x: 0, y: 0 };
+    
+    // 效能優化：追蹤是否需要更新畫面，避免無意義的渲染迴圈
+    let needsUpdate = true;
 
-    const getBaseZ = () => window.innerWidth <= 768 ? -50 : 0;
+    const getBaseZ = () => isMobile ? -50 : 0;
 
     const onDown = (e) => {
         if (isReloading || !e.target.closest('.cube')) return;
         isDragging = true;
+        needsUpdate = true;
         
         const touch = e.touches ? e.touches[0] : e;
         prevMouse = { x: touch.clientX, y: touch.clientY };
@@ -174,16 +181,19 @@ function initInteractiveCube() {
 
     const onMove = (e) => {
         if (!isDragging || isReloading) return;
-        e.preventDefault(); 
+        e.preventDefault(); // 防止手機端滑動頁面
         
         const touch = e.touches ? e.touches[0] : e;
         const dx = touch.clientX - prevMouse.x;
         const dy = touch.clientY - prevMouse.y;
         
-        targetRot.y += dx * 0.4;
-        targetRot.x -= dy * 0.4;
+        // 降低手機端的旋轉靈敏度，避免計算過於劇烈
+        const sensitivity = isMobile ? 0.3 : 0.4;
+        targetRot.y += dx * sensitivity;
+        targetRot.x -= dy * sensitivity;
 
         prevMouse = { x: touch.clientX, y: touch.clientY };
+        needsUpdate = true;
     };
 
     const onUp = () => {
@@ -192,6 +202,7 @@ function initInteractiveCube() {
         cube.style.cursor = 'grab';
     };
 
+    // 觸控事件加入 { passive: false } 確保 e.preventDefault() 能夠運作，避免畫面亂滾
     cubeWrapper.addEventListener('mousedown', onDown);
     document.addEventListener('mousemove', onMove, { passive: false });
     document.addEventListener('mouseup', onUp);
@@ -204,6 +215,7 @@ function initInteractiveCube() {
             if (isReloading) return;
             isReloading = true;
             isDragging = false;
+            needsUpdate = true;
 
             let finalRotX = targetRot.x;
             let finalRotY = targetRot.y;
@@ -212,7 +224,8 @@ function initInteractiveCube() {
                 z: -1500,
                 scale: 0,
                 duration: 0.7,
-                ease: "power2.in"
+                ease: "power2.in",
+                onUpdate: () => { needsUpdate = true; } // 確保動畫期間持續更新
             });
 
             gsap.to(targetRot, {
@@ -232,6 +245,7 @@ function initInteractiveCube() {
                         scale: 1,
                         duration: 1.2,
                         ease: "expo.out",
+                        onUpdate: () => { needsUpdate = true; },
                         onComplete: () => {
                             isReloading = false;
                         }
@@ -242,22 +256,38 @@ function initInteractiveCube() {
     }
 
     function loopCube() {
-        if (!isDragging && !isReloading) {
-            targetRot.y += 0.05;
-        }
-        
-        rot.x += (targetRot.x - rot.x) * 0.1;
-        rot.y += (targetRot.y - rot.y) * 0.1;
-
-        cube.style.transform = `translateZ(${getBaseZ() + state.z}px) scale(${state.scale}) rotateX(${rot.x}deg) rotateY(${rot.y}deg)`;
         requestAnimationFrame(loopCube);
+        
+        // ★ 效能優化：如果沒有在拖曳，且角度已經趨於穩定，就不再進行 DOM 操作
+        const diffX = Math.abs(targetRot.x - rot.x);
+        const diffY = Math.abs(targetRot.y - rot.y);
+        
+        if (!isDragging && !isReloading) {
+            targetRot.y += 0.05; // 待機自轉
+            needsUpdate = true;
+        }
+
+        if (diffX < 0.01 && diffY < 0.01 && !isDragging && !isReloading) {
+            // 方塊完全靜止，不浪費效能
+        } else {
+            rot.x += (targetRot.x - rot.x) * 0.1;
+            rot.y += (targetRot.y - rot.y) * 0.1;
+            needsUpdate = true;
+        }
+
+        // 只在數值改變時才修改 CSS，減少瀏覽器重繪(Repaint)負擔
+        if (needsUpdate) {
+            cube.style.transform = `translateZ(${getBaseZ() + state.z}px) scale(${state.scale}) rotateX(${rot.x}deg) rotateY(${rot.y}deg)`;
+            if (!isDragging && !isReloading) needsUpdate = false; // 渲染完畢後關閉旗標
+        }
     }
     loopCube();
 }
 
 
 function initFogAnimation() {
-    // ★ 提早浮現：將大部分觸發點從 80% 改為 95% 或 100%，元素一接觸螢幕邊緣即浮現，改善很久才出現的問題
+    window.addEventListener('load', () => ScrollTrigger.refresh());
+
     const tl = gsap.timeline({ scrollTrigger: { trigger: "#knowledge-section", start: "top 95%" } });
     
     tl.fromTo(".fog-header", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1 });
@@ -347,7 +377,7 @@ function renderQuiz() {
     `;
 }
 
-// ★★★ GLB + Matter.js Hybrid Engine ★★★
+// ★★★ GLB + Matter.js Hybrid Engine (效能優化版) ★★★
 function initHybridPhysics() {
     if (isMatterActive) return;
     isMatterActive = true;
@@ -369,9 +399,13 @@ function initHybridPhysics() {
     const wallR = Bodies.rectangle(w + thick/2, h / 2, thick, h + thick*2, wallOpts);
     
     const dollsBodies = [];
-    const DOLL_SIZE = 120; 
+    // ★ 效能優化：手機端把玩偶縮小一點點，避免擁擠與卡頓
+    const DOLL_SIZE = isMobile ? 90 : 120; 
     
-    for (let i = 0; i < 8; i++) {
+    // ★ 效能優化：手機端玩偶數量減少，以維持順暢的 60fps
+    const DOLL_COUNT = isMobile ? 5 : 8;
+
+    for (let i = 0; i < DOLL_COUNT; i++) {
         const physicsRadius = (DOLL_SIZE / 2) * 1.35;
         const body = Bodies.circle(Math.random() * w, Math.random() * h, physicsRadius, { 
             restitution: 0.6, 
@@ -393,6 +427,7 @@ function initHybridPhysics() {
 
     window.addEventListener('mousemove', (e) => updateRepelPos(e.clientX, e.clientY));
     
+    // 加入 passive: true 提昇行動裝置的捲動效能
     window.addEventListener('touchmove', (e) => {
         if(e.touches.length > 0) updateRepelPos(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
@@ -406,7 +441,7 @@ function initHybridPhysics() {
     });
 
     Events.on(physicsEngine, 'beforeUpdate', function() {
-        const blastRadius = 100; 
+        const blastRadius = isMobile ? 80 : 100; // 手機端推力範圍縮小
         const forceStrength = 0.02; 
 
         const bodiesNearMouse = Query.region(dollsBodies, {
@@ -428,7 +463,8 @@ function initHybridPhysics() {
 
     dollRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     dollRenderer.setSize(w, h);
-    dollRenderer.setPixelRatio(window.devicePixelRatio);
+    // ★ 效能優化：限制手機端最高解析度，避免高 Dpi 手機（如 iPhone）過熱
+    dollRenderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
     dollRenderer.outputColorSpace = THREE.SRGBColorSpace; 
     container.appendChild(dollRenderer.domElement);
 
@@ -533,6 +569,7 @@ function stopHybridPhysics() {
     isMatterActive = false;
 }
 
+// --- Top Three.js Cards (效能優化版) ---
 function initThree() {
     const container = document.getElementById('webgl-container');
     if (!container) return;
@@ -543,7 +580,8 @@ function initThree() {
     
     renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // ★ 效能優化：限制手機端背景渲染精度
+    renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
     
     const ambient = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambient);
@@ -556,7 +594,8 @@ function initThree() {
         return textureLoader.load(path, (t) => { t.colorSpace = THREE.SRGBColorSpace; });
     };
 
-    for(let i=0; i<INTRO_COUNT; i++) {
+    // ★ 效能優化：使用變數 INTRO_COUNT 控制生成數量 (手機 15 張 / 電腦 35 張)
+    for(let i=0; i < INTRO_COUNT; i++) {
         const frontPath = CARD_TEXTURES[i % CARD_TEXTURES.length];
         const backPath = CARD_BACK_TEXTURE[i % CARD_BACK_TEXTURE.length]; 
         
@@ -685,6 +724,7 @@ function animate() {
                 const dz = c1.position.z - c2.position.z;
                 const distSq = dx*dx + dy*dy + dz*dz;
                 
+                // ★ 效能優化：減少排斥計算的負載
                 if (distSq < MIN_DIST * MIN_DIST && distSq > 0) {
                     const dist = Math.sqrt(distSq);
                     const force = (MIN_DIST - dist) * 0.001; 
@@ -731,10 +771,3 @@ function onResize() {
     camera.updateProjectionMatrix(); 
     renderer.setSize(window.innerWidth, window.innerHeight); 
 }
-
-// ★ 強制在所有資源載入後重算 GSAP 動畫高度，徹底解決觸發太慢的問題
-window.addEventListener('load', () => {
-    if (typeof ScrollTrigger !== 'undefined') {
-        setTimeout(() => { ScrollTrigger.refresh(); }, 500); 
-    }
-});
