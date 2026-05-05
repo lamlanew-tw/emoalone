@@ -23,7 +23,6 @@ const CARD_TEXTURES = [
 const CARD_BACK_TEXTURE = ['./img/事件卡1.png', './img/事件卡2.png', './img/事件卡3.png']; 
 const DOLL_MODEL_PATH = './model/emo棋.glb'; 
 
-// ★ 文字排版：精準切割平均字數
 const QUIZ_DATA = [
     { 
       q: "伴侶因為工作太累，忘記了你們期待已久的<br>紀念日晚餐，你的第一反應是？", 
@@ -132,9 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if(document.getElementById('webgl-container')) initThree();
         
+        // ★ 修復：提早 1200px 觸發 3D 玩偶區塊的載入！這樣滑到時已經下載完成了，不會有延遲感。
         ScrollTrigger.create({
             trigger: "#quiz-entry",
-            start: "top bottom",
+            start: "top bottom+=1200", 
             onEnter: initHybridPhysics,
             onLeaveBack: stopHybridPhysics
         });
@@ -257,32 +257,31 @@ function initInteractiveCube() {
 
 
 function initFogAnimation() {
-    window.addEventListener('load', () => ScrollTrigger.refresh());
-
-    const tl = gsap.timeline({ scrollTrigger: { trigger: "#knowledge-section", start: "top 80%" } });
+    // ★ 提早浮現：將大部分觸發點從 80% 改為 95% 或 100%，元素一接觸螢幕邊緣即浮現，改善很久才出現的問題
+    const tl = gsap.timeline({ scrollTrigger: { trigger: "#knowledge-section", start: "top 95%" } });
     
     tl.fromTo(".fog-header", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1 });
     
     gsap.fromTo(".fog-card", 
         { y: 50, opacity: 0 }, 
-        { scrollTrigger: { trigger: ".fog-grid", start: "top 80%" }, y: 0, opacity: 1, duration: 1, stagger: 0.2 }
+        { scrollTrigger: { trigger: ".fog-grid", start: "top 90%" }, y: 0, opacity: 1, duration: 1, stagger: 0.2 }
     );
     
     gsap.fromTo(".timeline-line", 
         { height: 0 }, 
-        { scrollTrigger: { trigger: ".timeline-container", start: "top 80%" }, height: "100%", duration: 1.5, ease: "none" }
+        { scrollTrigger: { trigger: ".timeline-container", start: "top 90%" }, height: "100%", duration: 1.5, ease: "none" }
     );
     
     gsap.utils.toArray(".timeline-item").forEach(item => { 
         gsap.fromTo(item, 
             { y: 30, opacity: 0 }, 
-            { scrollTrigger: { trigger: item, start: "top 85%" }, y: 0, opacity: 1, duration: 0.8 }
+            { scrollTrigger: { trigger: item, start: "top 95%" }, y: 0, opacity: 1, duration: 0.8 }
         ); 
     });
     
     gsap.fromTo(".sos-tactical-card", 
         { y: 50, opacity: 0 }, 
-        { scrollTrigger: { trigger: ".sos-section", start: "top 80%" }, y: 0, opacity: 1, duration: 0.8, stagger: 0.2 }
+        { scrollTrigger: { trigger: ".sos-section", start: "top 95%" }, y: 0, opacity: 1, duration: 0.8, stagger: 0.2 }
     );
 }
 
@@ -332,7 +331,6 @@ function renderQuiz() {
     }
     const d = QUIZ_DATA[currentQ];
     
-    // ★ 關鍵修復：用 <span> 把文字包起來，這樣 <br> 標籤在 Flex 容器裡才不會失效，保證排版絕對精準對稱！
     container.innerHTML = `
         <div style="font-size:5rem; font-family:serif; margin-bottom:10px; color:#ddd;">${(currentQ + 1).toString().padStart(2, '0')}</div>
         <h3 style="font-size:1.3rem; margin-bottom:30px; color:#333; line-height: 1.6; text-align: center; display: flex; align-items: center; justify-content: center; height: 85px;">
@@ -598,7 +596,6 @@ function createDoubleSidedCard(front, back) {
     f.position.z = depth / 2 + 0.5; 
     grp.add(f);
 
-    // ★ 修復：new Mesh -> new THREE.Mesh，解決 3D 背景報錯問題
     const b = new THREE.Mesh(faceGeo, new THREE.MeshBasicMaterial({ 
         map: back, color: 0xffffff, transparent: true,
         polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2
@@ -734,3 +731,10 @@ function onResize() {
     camera.updateProjectionMatrix(); 
     renderer.setSize(window.innerWidth, window.innerHeight); 
 }
+
+// ★ 強制在所有資源載入後重算 GSAP 動畫高度，徹底解決觸發太慢的問題
+window.addEventListener('load', () => {
+    if (typeof ScrollTrigger !== 'undefined') {
+        setTimeout(() => { ScrollTrigger.refresh(); }, 500); 
+    }
+});
